@@ -35,7 +35,7 @@ python bot.py
 ```bash
 discord.py>=2.4.0
 python-dotenv>=1.0.0
-tzdata>=
+tzdata>=2025.1
 ```
 
 ## 📋 How to Use
