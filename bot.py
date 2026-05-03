@@ -111,14 +111,14 @@ class EventView(discord.ui.View):
 @app_commands.describe(
     name="Name of the event",
     date="Date of the event (DD/MM/YYYY)",
-    time="Time of the event (HH:MM)",
+    time_utc="Time of the event (HH:MM)",
     build="Composition with ';' between weapons (Tank;Healer;DPS1;DPS2)"
 )
 async def create_event(
     interaction: discord.Interaction, 
     name: str,
     date: str,
-    time: str,
+    time_utc: str,
     build: str
     ):
     if bot.active_event_id is not None:
@@ -126,7 +126,7 @@ async def create_event(
         return
     
     try:
-        full_dt_str = f"{date} {time}"
+        full_dt_str = f"{date} {time_utc}"
         dt_obj = datetime.strptime(full_dt_str, "%d/%m/%Y %H:%M")
         dt_obj = dt_obj.replace(tzinfo=zoneinfo.ZoneInfo("UTC"))
         unix_timestamp = int(dt_obj.timestamp())
