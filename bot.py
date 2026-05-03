@@ -128,7 +128,7 @@ async def create_event(
     try:
         full_dt_str = f"{date} {time}"
         dt_obj = datetime.strptime(full_dt_str, "%d/%m/%Y %H:%M")
-        dt_obj = dt_obj.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Rome"))
+        dt_obj = dt_obj.replace(tzinfo=zoneinfo.ZoneInfo("UTC"))
         unix_timestamp = int(dt_obj.timestamp())
         timestamp_display = f"<t:{unix_timestamp}:t>"
     except ValueError:
