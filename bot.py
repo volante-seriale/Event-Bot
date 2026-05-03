@@ -3,6 +3,8 @@ from discord.ext import commands
 from discord import app_commands
 import os
 from dotenv import load_dotenv
+from datetime import datetime
+import zoneinfo
 
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
@@ -109,25 +111,35 @@ class EventView(discord.ui.View):
 @app_commands.describe(
     name="Name of the event",
     date="Date of the event (DD/MM/YYYY)",
-    time_utc="Time of the event in UTC (HH:MM)",
+    time="Time of the event (HH:MM)",
     build="Composition with ';' between weapons (Tank;Healer;DPS1;DPS2)"
 )
 async def create_event(
     interaction: discord.Interaction, 
     name: str,
     date: str,
-    time_utc: str,
+    time: str,
     build: str
     ):
     if bot.active_event_id is not None:
         await interaction.response.send_message("⚠️ An event is already active!", ephemeral=True)
         return
     
+    try:
+        full_dt_str = f"{date} {time}"
+        dt_obj = datetime.strptime(full_dt_str, "%d/%m/%Y %H:%M")
+        dt_obj = dt_obj.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Rome"))
+        unix_timestamp = int(dt_obj.timestamp())
+        timestamp_display = f"<t:{unix_timestamp}:t>"
+    except ValueError:
+        await interaction.response.send_message("❌ Invalid date/time format! Use DD/MM/YYYY for date and HH:MM for time.", ephemeral=True)
+        return
+    
     build_list = [item.strip() for item in build.split(";")]
     
     embed = discord.Embed(
         title=name,
-        description=f"**Date**: {date} | **Time (UTC)**: {time_utc}",
+        description=f"**Date**: {date} | **Time**: {timestamp_display}",
         color=discord.Color.gold()
     )
     
