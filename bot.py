@@ -139,7 +139,7 @@ async def create_event(
     
     embed = discord.Embed(
         title=name,
-        description=f"**Date**: {date} | **Time**: {timestamp_display}",
+        description=f"@everyone\n**Date**: {date} | **Time**: {timestamp_display}",
         color=discord.Color.gold()
     )
     
