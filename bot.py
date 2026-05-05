@@ -112,7 +112,8 @@ class EventView(discord.ui.View):
     name="Name of the event",
     date="Date of the event (DD/MM/YYYY)",
     time_utc="Time of the event (HH:MM)",
-    build="Composition with ';' between weapons (Tank;Healer;DPS1;DPS2)"
+    build="Composition with ';' between weapons (Tank;Healer;DPS1;DPS2)",
+    mention_role="Role to mention when announcing the event"
 )
 async def create_event(
     interaction: discord.Interaction, 
@@ -120,7 +121,7 @@ async def create_event(
     date: str,
     time_utc: str,
     build: str,
-    mention_role: discord.role
+    mention_role: discord.Role
     ):
     if bot.active_event_id is not None:
         await interaction.response.send_message("⚠️ An event is already active!", ephemeral=True)
@@ -148,7 +149,7 @@ async def create_event(
     embed.add_field(name="Composition", value=initial_comp, inline=False)
     
     view = EventView(bot_instance=bot, creator_id=interaction.user.id, event_name=name, build_list=build_list)
-    await interaction.response.send_message(mention_role, embed=embed, view=view)
+    await interaction.response.send_message(content=mention_role.mention, embed=embed, view=view)
 
     original_message = await interaction.original_response()
     bot.active_event_id = original_message.id
