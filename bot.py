@@ -119,7 +119,8 @@ async def create_event(
     name: str,
     date: str,
     time_utc: str,
-    build: str
+    build: str,
+    mention_role: discord.role
     ):
     if bot.active_event_id is not None:
         await interaction.response.send_message("⚠️ An event is already active!", ephemeral=True)
@@ -139,7 +140,7 @@ async def create_event(
     
     embed = discord.Embed(
         title=name,
-        description=f"<@&1500108792002515104> \n**Date**: {date} | **Time**: {timestamp_display}",
+        description=f"**Date**: {date} | **Time**: {timestamp_display}",
         color=discord.Color.gold()
     )
     
@@ -147,7 +148,7 @@ async def create_event(
     embed.add_field(name="Composition", value=initial_comp, inline=False)
     
     view = EventView(bot_instance=bot, creator_id=interaction.user.id, event_name=name, build_list=build_list)
-    await interaction.response.send_message(embed=embed, view=view)
+    await interaction.response.send_message(mention_role, embed=embed, view=view)
 
     original_message = await interaction.original_response()
     bot.active_event_id = original_message.id
