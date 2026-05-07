@@ -11,7 +11,7 @@ Users can create events using a slash command, and participants can claim specif
 - Sign-Up / Sign-Off functionality
 - Creator-only / Admin **Ping** button (mentions all participants)
 - Creator-only / Admin **End Event** button
-- Only **one active event** allowed at a time
+- **Multiple** events simultaneously
 - Uses **UTC** timezone for timestamps
 
 ## 🚀 Installation
