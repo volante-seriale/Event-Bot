@@ -36,16 +36,22 @@ class RoleSelect(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         slot_index = int(self.values[0])
         user_id = interaction.user.id
+
+        occupant_id = next((uid for uid, slot in self.parent_view.participants_roles.items() if slot == slot_index), None)
+
+        if occupant_id is not None and occupant_id != user_id:
+            await interaction.response.send_message("That role is already taken by <@{occupant_id}>. Please choose another one.", ephemeral=True)
+            return
         
         self.parent_view.participants_roles[user_id] = slot_index
         
         original_msg = interaction.message.reference.cached_message
-        if not original_msg: # Fallback if message not in cache
+        if not original_msg:
             original_msg = await interaction.channel.fetch_message(interaction.message.reference.message_id)
-            
+        
         new_embed = self.parent_view.update_embed(original_msg.embeds[0])
         await original_msg.edit(embed=new_embed, view=self.parent_view)
-        await interaction.response.send_message(f"You have selected: {self.options[slot_index].label}", ephemeral=True)
+        await interaction.response.send_message(f"You have signed up as **{self.options[slot_index].label}**.", ephemeral=True)
 
 # --- UI components ---
 class EventView(discord.ui.View):
