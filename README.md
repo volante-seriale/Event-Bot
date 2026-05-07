@@ -9,8 +9,8 @@ Users can create events using a slash command, and participants can claim specif
 - Role selection via dropdown menu
 - Live updating composition embed
 - Sign-Up / Sign-Off functionality
-- Creator-only **Ping** button (mentions all participants)
-- Creator-only **End Event** button
+- Creator-only / Admin **Ping** button (mentions all participants)
+- Creator-only / Admin **End Event** button
 - Only **one active event** allowed at a time
 - Uses **UTC** timezone for timestamps
 
@@ -49,8 +49,8 @@ tzdata>=2025.1
 ### Available Buttons
 - **Sing-Up** (Green)   →  Chose your role from the dropdown
 - **Sing-Off** (Red)    →  Remove your self from the list
-- **Sing-UP** (Blurple) →  Ping all signed-up members (Only for even creator)
-- **Sing-UP** (Gray)    →  Close the event (Only for even creator)
+- **Sing-UP** (Blurple) →  Ping all signed-up members (Only for event creator and admin)
+- **Sing-UP** (Gray)    →  Close the event (Only for event creator and admin)
 
 ## 📁 Project Structure
 ```bash
