@@ -16,7 +16,6 @@ intents.members = True
 class EventBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="?", intents=intents)
-        self.active_event_id = None
 
     async def setup_hook(self):
         await self.tree.sync()
@@ -40,7 +39,7 @@ class RoleSelect(discord.ui.Select):
         occupant_id = next((uid for uid, slot in self.parent_view.participants_roles.items() if slot == slot_index), None)
 
         if occupant_id is not None and occupant_id != user_id:
-            await interaction.response.send_message("That role is already taken by <@{occupant_id}>. Please choose another one.", ephemeral=True)
+            await interaction.response.send_message(f"That role is already taken by <@{occupant_id}>. Please choose another one.", ephemeral=True)
             return
         
         self.parent_view.participants_roles[user_id] = slot_index
@@ -115,7 +114,7 @@ class EventView(discord.ui.View):
         for child in self.children:
             child.disabled = True
         await interaction.response.edit_message(view=self)
-        self.bot.active_event_id = None
+        
         await interaction.followup.send(f"The event '{self.event_name}' has ended.", ephemeral=False)
 
 # --- Commands ---
@@ -135,9 +134,6 @@ async def create_event(
     build: str,
     mention_role: discord.Role
     ):
-    if bot.active_event_id is not None:
-        await interaction.response.send_message("⚠️ An event is already active!", ephemeral=True)
-        return
     
     try:
         full_dt_str = f"{date} {time_utc}"
@@ -162,8 +158,5 @@ async def create_event(
     
     view = EventView(bot_instance=bot, creator_id=interaction.user.id, event_name=name, build_list=build_list)
     await interaction.response.send_message(content=mention_role.mention, embed=embed, view=view)
-
-    original_message = await interaction.original_response()
-    bot.active_event_id = original_message.id
-
+    
 bot.run(TOKEN)
