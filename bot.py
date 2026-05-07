@@ -84,8 +84,11 @@ class EventView(discord.ui.View):
         
     @discord.ui.button(label="Ping", style= discord.ButtonStyle.blurple)
     async def ping_participants(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.creator_id:
-            await interaction.response.send_message("Only the event creator can ping participants.", ephemeral=True)
+        is_creator = interaction.user.id == self.creator_id
+        is_admin = interaction.user.guild_permissions.administrator
+        
+        if not (is_creator or is_admin):
+            await interaction.response.send_message("Only the event creator and administrators can ping participants.", ephemeral=True)
             return
         
         if not self.participants_roles:
@@ -97,8 +100,11 @@ class EventView(discord.ui.View):
         
     @discord.ui.button(label="End Event", style=discord.ButtonStyle.gray)
     async def end_event(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.creator_id:
-            await interaction.response.send_message("Only the event creator can end the event.", ephemeral=True)
+        is_creator = interaction.user.id == self.creator_id
+        is_admin = interaction.user.guild_permissions.administrator
+        
+        if not (is_creator or is_admin):
+            await interaction.response.send_message("Only the event creator and administrators can end the event.", ephemeral=True)
             return
         for child in self.children:
             child.disabled = True
