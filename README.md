@@ -47,10 +47,10 @@ tzdata>=2025.1
              build: "Tank;Healer;DPS1;DPS2;DPS3;etc"
 ```
 ### Available Buttons
-- **Sing-Up** (Green)   →  Chose your role from the dropdown
-- **Sing-Off** (Red)    →  Remove your self from the list
-- **Sing-UP** (Blurple) →  Ping all signed-up members (Only for event creator and admin)
-- **Sing-UP** (Gray)    →  Close the event (Only for event creator and admin)
+- **Sing-Up** (Green) → Chose your role from the dropdown
+- **Sing-Off** (Red) → Remove your self from the list
+- **Sing-UP** (Blurple) → Ping all signed-up members (Only for event creator and admin)
+- **Sing-UP** (Gray) → Close the event (Only for event creator and admin)
 
 ## 📁 Project Structure
 ```bash
