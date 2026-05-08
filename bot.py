@@ -15,9 +15,24 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
-FILE_PATH = "events.json"
+FILE_PATH = "data/events.json"
 
 # --- Utility per il JSON ---
+def _write_json(data):
+folder = os.path.dirname(FILE_PATH)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    
+    fd, temp_path = tempfile.mkstemp(dir=folder, text=True)
+    try:
+        with os.fdopen(fd, 'w') as f:
+            json.dump(data, f, indent=4)
+        os.replace(temp_path, FILE_PATH)
+    except Exception as e:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        raise e
+
 def load_events():
     try:
         with open(FILE_PATH, "r") as f:
@@ -28,16 +43,15 @@ def load_events():
 def save_event_data(message_id, data):
     events = load_events()
     events[str(message_id)] = data
-    with open(FILE_PATH, "w") as f:
-        json.dump(events, f, indent=4)
+    _write_json(events)
 
 def delete_event_data(message_id):
     events = load_events()
-    if str(message_id) in events:
-        del events[str(message_id)]
-        with open(FILE_PATH, "w") as f:
-            json.dump(events, f, indent=4)
-
+    msg_id_str = str(message_id)
+    if msg_id_str in events:
+        del events[msg_id_str]
+        _write_json(events)
+        
 # --- UI Components ---
 class RoleSelect(discord.ui.Select):
     def __init__(self, parent_view, build_list):
@@ -87,11 +101,12 @@ class RoleSelect(discord.ui.Select):
         original_msg = await channel.fetch_message(int(self.parent_view.event_id))
         
         new_embed = self.parent_view.update_embed(original_msg.embeds[0])
-        await original_msg.edit(embed=new_embed, view=self.parent_view)
-        
-        await interaction.response.send_message(
+
+        await interaction.followup.send(
             f"You signed up as **{self.options[slot_index].label}**.", ephemeral=True
         )
+
+        await original_msg.edit(embed=new_embed, view=self.parent_view)
 
 class EventView(discord.ui.View):
     def __init__(self, event_id, event_data):
