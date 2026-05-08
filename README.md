@@ -5,12 +5,12 @@ Users can create events using a slash command, and participants can claim specif
 
 ## ✨ Features
 - Slash command `/create_event` for quick event creation
-- Persistent interactive view untill the end of the event 
+- Persistent interactive view untill the end of the event (even after restart)
 - Role selection via dropdown menu
 - Live updating composition embed
 - Sign-Up / Sign-Off functionality
-- Creator-only / Admin **Ping** button (mentions all participants)
-- Creator-only / Admin **End Event** button
+- Creator-only/Admin **Ping** button (mentions all participants)
+- Creator-only/Admin **End Event** button
 - **Multiple** events simultaneously
 - Uses **UTC** timezone for timestamps
 
