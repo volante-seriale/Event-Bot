@@ -150,7 +150,7 @@ class EventView(discord.ui.View):
         await interaction.response.send_message(f"Ping: {mentions}", ephemeral=False)
         
     @discord.ui.button(label="End Event", style=discord.ButtonStyle.gray, custom_id="evt:end")
-    async def end_event(self, interaction: interaction, button: discord.ui.Button):
+    async def end_event(self, interaction: discord.Interaction, button: discord.ui.Button):
         is_creator = interaction.user.id == self.event_data["creator_id"]
         is_admin = interaction.user.guild_permissions.administrator
         
