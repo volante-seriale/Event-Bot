@@ -58,5 +58,7 @@ eventbot/
 ├── bot.py # Main file (rename as you prefer)
 ├── .env   # ← Add this to .gitignore
 ├── requirements.txt
-└── README.md
+├── README.md
+└── data/
+    └── events.json
 ```
