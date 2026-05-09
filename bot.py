@@ -6,6 +6,7 @@ import json
 from dotenv import load_dotenv
 from datetime import datetime
 import zoneinfo
+import tempfile
 
 # --- Configurazione Iniziale ---
 load_dotenv()
@@ -19,7 +20,7 @@ FILE_PATH = "data/events.json"
 
 # --- Utility per il JSON ---
 def _write_json(data):
-folder = os.path.dirname(FILE_PATH)
+    folder = os.path.dirname(FILE_PATH)
     if folder:
         os.makedirs(folder, exist_ok=True)
     
@@ -67,8 +68,8 @@ class RoleSelect(discord.ui.Select):
         user_id = str(interaction.user.id)
         
         participants = self.parent_view.event_data["participants"]
-        occupant_id = next((uid for uid, slot in participants.items() if slot == slot_index), None)
 
+        occupant_id = next((uid for uid, slot in participants.items() if slot == slot_index), None)
         if occupant_id is not None and occupant_id != user_id:
             await interaction.response.send_message(
                 f"That role is already taken by <@{occupant_id}>.", ephemeral=True
@@ -91,22 +92,15 @@ class RoleSelect(discord.ui.Select):
                 "❌ The event no longer exists. Signup cancelled.", ephemeral=True
             )
         except Exception as e:
-            await interaction.response.send_message(
-                f"An error occurred: {str(e)}", ephemeral=True
-            )
-        participants[user_id] = slot_index
-        save_event_data(self.parent_view.event_id, self.parent_view.event_data)
-        
-        channel = interaction.channel
-        original_msg = await channel.fetch_message(int(self.parent_view.event_id))
-        
-        new_embed = self.parent_view.update_embed(original_msg.embeds[0])
+            if not interaction.response.is_done():
+                await interaction.response.send_message(
+                    f"Error: {str(e)}. Try again later.", ephemeral=True
+                )
+            else: 
+                await interaction.followup.send(
+                    f"Error: {str(e)}. Try again later.", ephemeral=True
+                )
 
-        await interaction.followup.send(
-            f"You signed up as **{self.options[slot_index].label}**.", ephemeral=True
-        )
-
-        await original_msg.edit(embed=new_embed, view=self.parent_view)
 
 class EventView(discord.ui.View):
     def __init__(self, event_id, event_data):
