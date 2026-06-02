@@ -1,4 +1,15 @@
 services:
+    db:
+        image: postgres:16-alpine
+        container_name: discord_event_db
+        restart: always
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER:-bot}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bot}
+            POSTGRES_DB: ${POSTGRES_DB:-events}
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+
     event-bot:
         build:
             context: .
@@ -9,5 +20,10 @@ services:
             - .env
         environment:
             TZ: Europe/Rome
-        volumes:
-            - ./data:/app/data
+            DATABASE_URL: postgresql://${POSTGRES_USER:-bot}:${POSTGRES_PASSWORD:-bot}@db:5432/${POSTGRES_DB:-events}
+        depends_on:
+            db:
+                condition: service_healthy
+
+volumes:
+    pgdata:

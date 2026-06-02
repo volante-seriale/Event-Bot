@@ -1,14 +1,13 @@
 import json
-import sqlite3
 
-from config import DB_PATH
+import psycopg2
+from psycopg2.extras import Json
+
+from config import DATABASE_URL
 
 
 def _get_conn():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    return conn
+    return psycopg2.connect(DATABASE_URL)
 
 
 def init_db():
@@ -16,7 +15,7 @@ def init_db():
     conn.execute("""
         CREATE TABLE IF NOT EXISTS events (
             message_id TEXT PRIMARY KEY,
-            data TEXT NOT NULL
+            data JSONB NOT NULL
         )
     """)
     conn.commit()
@@ -27,15 +26,20 @@ def load_all_events():
     conn = _get_conn()
     rows = conn.execute("SELECT message_id, data FROM events").fetchall()
     conn.close()
-    return {row["message_id"]: json.loads(row["data"]) for row in rows}
+    return {
+        row[0]: row[1] if isinstance(row[1], dict) else json.loads(row[1])
+        for row in rows
+    }
 
 
 def save_event(message_id, data):
     conn = _get_conn()
     conn.execute(
-        "INSERT INTO events (message_id, data) VALUES (?, ?) "
-        "ON CONFLICT(message_id) DO UPDATE SET data = excluded.data",
-        (str(message_id), json.dumps(data)),
+        """
+        INSERT INTO events (message_id, data) VALUES (%s, %s)
+        ON CONFLICT (message_id) DO UPDATE SET data = excluded.data
+        """,
+        (str(message_id), Json(data)),
     )
     conn.commit()
     conn.close()
@@ -43,6 +47,6 @@ def save_event(message_id, data):
 
 def delete_event(message_id):
     conn = _get_conn()
-    conn.execute("DELETE FROM events WHERE message_id = ?", (str(message_id),))
+    conn.execute("DELETE FROM events WHERE message_id = %s", (str(message_id),))
     conn.commit()
     conn.close()

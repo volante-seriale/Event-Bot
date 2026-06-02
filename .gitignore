@@ -1,6 +1,2 @@
 #env file
 .env
-
-#data files
-/data
-/data/*
