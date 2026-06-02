@@ -54,11 +54,20 @@ tzdata>=2025.1
 
 ## 📁 Project Structure
 ```bash
-eventbot/
-├── bot.py # Main file (rename as you prefer)
-├── .env   # ← Add this to .gitignore
+bot_sign_up/
+├── bot.py                  # Entry point (avvio bot)
+├── config.py               # Configurazione e costanti
+├── db.py                   # SQLite CRUD
+├── .env                    # ← Add this to .gitignore
 ├── requirements.txt
 ├── README.md
+├── commands/
+│   ├── __init__.py
+│   └── events.py           # Cog con /create_event
+├── ui/
+│   ├── __init__.py
+│   ├── role_select.py      # Dropdown selezione ruolo
+│   └── event_view.py       # Bottoni Sign-Up/Off/Ping/End
 └── data/
-    └── events.json
+    └── events.db           # SQLite database (auto-creato)
 ```
