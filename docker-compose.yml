@@ -1,0 +1,14 @@
+services:
+  event-bot:
+    build: .
+    container_name: discord_event_bot
+    user: "1000:1000"
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - TZ=Europe/Rome
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./data:/app/data
