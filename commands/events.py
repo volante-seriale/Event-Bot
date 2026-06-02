@@ -32,6 +32,7 @@ class EventsCog(commands.Cog):
         build: str,
         mention_role: discord.Role = None,
     ):
+        # 1. Validazione della data e ora
         try:
             full_dt_str = f"{date} {time_utc}"
             dt_obj = datetime.strptime(full_dt_str, "%d/%m/%Y %H:%M")
@@ -44,50 +45,75 @@ class EventsCog(commands.Cog):
             )
             return
 
+        # Mandiamo la risposta iniziale per evitare il timeout di 3 secondi di Discord
         await interaction.response.send_message(
             f"Creating thread for event: **{name}**...", ephemeral=True
         )
 
+        # 2. Controllo dei permessi del canale prima di procedere
         channel = interaction.channel
-        thread = await channel.create_thread(
-            name=f"📅 {name} | {date} at {time_utc} UTC",
-            type=discord.ChannelType.public_thread,
-            auto_archive_duration=1440,
-        )
+        if not isinstance(channel, (discord.TextChannel, discord.VoiceChannel, discord.StageChannel)):
+            await interaction.edit_original_response(
+                content="❌ Events can only be created in standard text or voice channels."
+            )
+            return
 
-        build_list = [item.strip() for item in build.split(";")]
-        embed = discord.Embed(
-            title=name,
-            description=f"**Date**: {date} | **Time**: {timestamp_display}",
-            color=discord.Color.gold(),
-        )
+        try:
+            # CORREZIONE: Creazione corretta del thread senza passare 'type' non necessario
+            thread = await channel.create_thread(
+                name=f"📅 {name} | {date} at {time_utc} UTC",
+                auto_archive_duration=1440,  # 24 ore
+            )
 
-        initial_comp = "\n".join(
-            [f"**{i + 1}\\. {role}**: ---" for i, role in enumerate(build_list)]
-        )
-        embed.add_field(name="Composition", value=initial_comp, inline=False)
-        content_str = mention_role.mention if mention_role else ""
-        msg = await thread.send(
-            content=content_str,
-            embed=embed,
-            allowed_mentions=discord.AllowedMentions(roles=True)
-            if mention_role
-            else None,
-        )
+            build_list = [item.strip() for item in build.split(";") if item.strip()]
+            
+            embed = discord.Embed(
+                title=name,
+                description=f"**Date**: {date} | **Time**: {timestamp_display}",
+                color=discord.Color.gold(),
+            )
 
-        event_data = {
-            "name": name,
-            "creator_id": interaction.user.id,
-            "build_list": build_list,
-            "participants": {},
-        }
+            initial_comp = "\n".join(
+                [f"**{i + 1}\\. {role}**: ---" for i, role in enumerate(build_list)]
+            )
+            embed.add_field(name="Composition", value=initial_comp, inline=False)
+            
+            content_str = mention_role.mention if mention_role else ""
+            
+            # Inviamo il messaggio dentro al thread appena creato
+            msg = await thread.send(
+                content=content_str,
+                embed=embed,
+                allowed_mentions=discord.AllowedMentions(roles=True) if mention_role else discord.AllowedMentions.none(),
+            )
 
-        save_event(msg.id, event_data)
-        view = EventView(event_id=msg.id, event_data=event_data)
-        await msg.edit(view=view)
-        await interaction.edit_original_response(
-            content=f"✅ Event thread created successfully: {thread.mention}"
-        )
+            event_data = {
+                "name": name,
+                "creator_id": interaction.user.id,
+                "build_list": build_list,
+                "participants": {},
+            }
+
+            # Salvataggio DB e attivazione della View dei bottoni
+            save_event(msg.id, event_data)
+            view = EventView(event_id=msg.id, event_data=event_data)
+            await msg.edit(view=view)
+            
+            # Conferma finale all'utente
+            await interaction.edit_original_response(
+                content=f"✅ Event thread created successfully: {thread.mention}"
+            )
+
+        except discord.Forbidden:
+            # Gestione errore nel caso in cui il bot non abbia i permessi nel canale
+            await interaction.edit_original_response(
+                content="❌ I don't have permission to create threads or send messages in this channel."
+            )
+        except Exception as e:
+            # Qualsiasi altro errore imprevisto
+            await interaction.edit_original_response(
+                content=f"❌ An unexpected error occurred: {str(e)}"
+            )
 
 
 async def setup(bot: commands.Bot):
