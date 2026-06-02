@@ -1,11 +1,6 @@
 #env file
 .env
 
-#container
-compose.yml
-Dockerfile
-.dockerignore
-
 #data files
 /data
 /data/*
