@@ -196,7 +196,7 @@ class EventBot(commands.Bot):
 bot = EventBot()
 
 # --- Commands ---
-@bot.tree.command(name="create_event", description="Create a new event.")
+@bot.tree.command(name="create_event", description="Create a new event inside a thread.")
 @app_commands.describe(
     name="Name of the event",
     date="Date (DD/MM/YYYY)",
@@ -222,8 +222,16 @@ async def create_event(
         await interaction.response.send_message("❌ Invalid format! Use DD/MM/YYYY and HH:MM.", ephemeral=True)
         return
     
-    build_list = [item.strip() for item in build.split(";")]
+    await interaction.response.send_message(f"Creating thread for event: **{name}**...", ephemeral=True)
     
+    channel = interaction.channel
+    thread = await channel.create_thread(
+        name=f"📅 {name}",
+        type=discord.ChannelType.public_thread,
+        auto_archive_duration=1440 # 24 ore di inattività prima dell'archiviazione automatica
+    )
+    
+    build_list = [item.strip() for item in build.split(";")]
     embed = discord.Embed(
         title=name,
         description=f"**Date**: {date} | **Time**: {timestamp_display}",
@@ -232,16 +240,12 @@ async def create_event(
     
     initial_comp = "\n".join([f"**{i+1}\\. {role}**: ---" for i, role in enumerate(build_list)])
     embed.add_field(name="Composition", value=initial_comp, inline=False)
-    
     content_str = mention_role.mention if mention_role else ""
-    
-    await interaction.response.send_message(
+    msg = await thread.send(
         content=content_str,
-        embed=embed, 
+        embed=embed,
         allowed_mentions=discord.AllowedMentions(roles=True) if mention_role else None
     )
-    
-    msg = await interaction.original_response()
     
     event_data = {
         "name": name,
@@ -253,5 +257,6 @@ async def create_event(
     save_event_data(msg.id, event_data)
     view = EventView(event_id=msg.id, event_data=event_data)
     await msg.edit(view=view)
+    await interaction.edit_original_response(content=f"✅ Event thread created successfully: {thread.mention}")    
     
 bot.run(TOKEN)
