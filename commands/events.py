@@ -50,7 +50,7 @@ class EventsCog(commands.Cog):
 
         channel = interaction.channel
         thread = await channel.create_thread(
-            name=f"📅 {name}",
+            name=f"📅 {name} | {date} at {time_utc} UTC",
             type=discord.ChannelType.public_thread,
             auto_archive_duration=1440,
         )

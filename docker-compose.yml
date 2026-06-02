@@ -11,11 +11,6 @@ services:
             - "127.0.0.1:5432:5432"
         volumes:
             - pgdata:/var/lib/postgresql/data
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bot}"]
-            interval: 5s
-            timeout: 5s
-            retries: 5
 
     event-bot:
         build:
@@ -28,9 +23,6 @@ services:
         environment:
             TZ: Europe/Rome
             DATABASE_URL: postgresql://${POSTGRES_USER:-bot}:${POSTGRES_PASSWORD:-bot}@db:5432/${POSTGRES_DB:-events}
-        depends_on:
-            db:
-                condition: service_healthy
 
 volumes:
     pgdata:
