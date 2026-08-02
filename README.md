@@ -8,9 +8,9 @@ Users can create events using a slash command, and participants can claim specif
 - Persistent interactive view untill the end of the event (even after restart)
 - Role selection via dropdown menu
 - Live updating composition embed
-- Sign-Up / Sign-Off functionality
-- Creator-only/Admin **Ping** button (mentions all participants)
-- Creator-only/Admin **End Event** button
+- **Sign-Up/Sign-Off** functionality
+- Creator/Admin **Ping** button (mentions all participants)
+- Creator/Admin **End Event** button
 - **Multiple** events simultaneously
 - Uses **UTC** timezone for timestamps
 
@@ -41,33 +41,36 @@ tzdata>=2025.1
 ## 📋 How to Use
 ### Create an Event
 ```bash
-    /create_event name: "Evening Raid" 
-             date: "10/05/2026" 
-             time_utc: "19:00" 
-             build: "Tank;Healer;DPS1;DPS2;DPS3;etc"
+    /create_event 
+            name: "Evening Raid" 
+            date: "10/05/2026" 
+            time_utc: "19:00" 
+            build: "Tank;Healer;DPS1;DPS2;DPS3;etc"
+            mention_role: "@member"
+            *Optional* builds_sheet: "#builds" 
 ```
 ### Available Buttons
 - **Sing-Up** (Green) → Chose your role from the dropdown
 - **Sing-Off** (Red) → Remove your self from the list
-- **Sing-UP** (Blurple) → Ping all signed-up members (Only for event creator and admin)
-- **Sing-UP** (Gray) → Close the event (Only for event creator and admin)
+- **Ping** (Blurple) → Ping all signed-up members (Only for event creator and admin)
+- **End Event** (Gray) → Close the event (Only for event creator and admin)
 
 ## 📁 Project Structure
 ```bash
 bot_sign_up/
-├── bot.py                  # Entry point (avvio bot)
-├── config.py               # Configurazione e costanti
+├── bot.py                  # Entry point
+├── config.py               # Configuration and constant
 ├── db.py                   # SQLite CRUD
-├── .env                    # ← Add this to .gitignore
+├── .env                    # Sensible variables ← Add this to .gitignore
 ├── requirements.txt
 ├── README.md
 ├── commands/
 │   ├── __init__.py
-│   └── events.py           # Cog con /create_event
+│   └── events.py           # Cog with /create_event
 ├── ui/
 │   ├── __init__.py
-│   ├── role_select.py      # Dropdown selezione ruolo
-│   └── event_view.py       # Bottoni Sign-Up/Off/Ping/End
+│   ├── role_select.py      # Dropdown selection role
+│   └── event_view.py       # Buttons Sign-Up/Off/Ping/End
 └── data/
-    └── events.db           # SQLite database (auto-creato)
+    └── events.db           # SQLite database
 ```

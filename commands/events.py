@@ -61,7 +61,7 @@ class EventsCog(commands.Cog):
         try:            
             date_str = dt_obj.strftime("%d/%m/%Y at %H:%M UTC")
             
-            main_msg = await channel.send(f"📅 {name} | **<t:{unix_timestamp}:f>**")
+            main_msg = await channel.send(f"📅 {name} | **<t:{unix_timestamp}:f>** - {mention_role.mention}")
             
             thread = await main_msg.create_thread(
                 name=f"📅 {name} | {date_str}"[:100],
