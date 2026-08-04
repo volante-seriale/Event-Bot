@@ -75,15 +75,15 @@ class EventsCog(commands.Cog):
                 description=f"**When**: {timestamp_display}",
                 color=discord.Color.gold(),
             )
-            
-            if builds_sheet:
-                embed.add_field(name="Builds Sheet", value=builds_sheet.mention, inline=False)
-            
+                        
             initial_comp = "\n".join(
                 [f"**{i + 1}\\. {role}**: ---" for i, role in enumerate(build_list)]
             )
             embed.add_field(name="Composition", value=initial_comp, inline=False)
-                        
+                
+            if builds_sheet:
+                embed.add_field(name="Builds Sheet", value=builds_sheet.mention, inline=False)
+        
             msg = await thread.send(
                 embed=embed,
                 allowed_mentions=discord.AllowedMentions(roles=True) if mention_role else discord.AllowedMentions.none(),
