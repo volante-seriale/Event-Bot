@@ -21,7 +21,12 @@ class EventView(discord.ui.View):
             composition_lines.append(f"**{i + 1}\\. {role_name}**: {user_display}")
 
         new_value = "\n".join(composition_lines)
-        embed.set_field_at(0, name="Composition", value=new_value, inline=False)
+        
+        for index, field in enumerate(embed.fields):
+            if field.name == "Composition":
+                embed.set_field_at(index, name="Composition", value=new_value, inline=False)
+                break
+            
         return embed
 
     @discord.ui.button(
